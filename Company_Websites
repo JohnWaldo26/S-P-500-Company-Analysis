@@ -1,0 +1,72 @@
+import pandas as pd # library for data analysis
+import json
+import requests # library to handle requests
+import selenium
+from bs4 import BeautifulSoup # library to parse HTML documents
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.service import Service
+import pandas as pd
+
+
+
+s=Service('/usr/local/bin/chromedriver')
+driver = webdriver.Chrome(service=s)
+wikiurl="https://en.wikipedia.org/wiki/List_of_S&P_500_companies"
+driver.get("https://en.wikipedia.org/wiki/List_of_S&P_500_companies")
+ 
+ 
+
+
+x=1
+while x<504:
+    x=str(x)
+    element = driver.find_element(By.XPATH, '//*[@id="constituents"]/tbody/tr['+x+']/td[2]/a')
+    x=int(x)
+    company_wiki_url=element.get_attribute("href")
+    
+    if x==334:
+        df=pd.read_html(company_wiki_url,match="URL")
+        df3 = pd.DataFrame()
+        df3= df[0][:200]
+        length=len(df3.index)
+
+        y=0
+        while y<length:
+            company_string=str(df[0][1][y])
+            final_four=company_string[-4:]
+            if final_four==".com":
+                print(df[0][1][y])
+                print(x)
+                y=len(df3.index)
+            else:
+                y=y+1
+    elif x==377:##Pool Corporation Does Not Have An Official Wikipedia Website
+        print("https://www.poolcorp.com")
+        print(x)
+    elif x==378:##PPG Was Giving Me a HTTP 404 Error So I had to manually find it :(
+        print("https://www.ppg.com")   
+        print(x)
+    else:
+        df=pd.read_html(company_wiki_url,match="Website")   
+        df3 = pd.DataFrame()
+        df3= df[0][:200]
+        length=len(df3.index)
+        y=0
+        while y<length:
+            company_string=str(df[0][1][y])
+            final_four=company_string[-4:]
+            if final_four==".com":
+                print(df[0][1][y])
+                print(x)
+                y=len(df3.index)
+            else:
+                y=y+1
+    x=x+1
+    
+    
+        
+        
+    
